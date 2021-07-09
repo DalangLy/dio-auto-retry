@@ -1,10 +1,9 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:dio/dio.dart';
-import 'package:dio_auto_retry/interceptor/custom_interceptors.dart';
-import 'package:dio_auto_retry/interceptor/dio_connectivity_request_retrier.dart';
+import 'package:dio_auto_retry/di.dart';
+import 'package:dio_auto_retry/get_data.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+void main()  {
+  init();
   runApp(MyApp());
 }
 
@@ -33,20 +32,12 @@ class _HomeState extends State<Home> {
   late String text;
   late bool isLoading;
 
-  late Dio dio;
-
-  late Connectivity connectivity;
-
   @override
   void initState() {
     super.initState();
 
-    dio = Dio();
     text = 'Press the button 👇';
     isLoading = false;
-    connectivity = Connectivity();
-
-    dio.interceptors.add(CustomInterceptors(requestRetrier: DioConnectivityRequestRetrier(dio: dio, connectivity: connectivity)));
 
     // dio.interceptors.add(InterceptorsWrapper(
     //     onRequest:(options, handler){
@@ -98,13 +89,11 @@ class _HomeState extends State<Home> {
                   setState(() {
                     isLoading = true;
                   });
-                  final Response response = await dio.get('https://jsonplaceholder.typicode.com/posts/1');
-                  if(response.statusCode == 200){
-                    setState(() {
-                      text = response.data['body'];
-                      isLoading = false;
-                    });
-                  }
+                  final String text1 = await sl<GetData>().fetchApi();
+                  setState(() {
+                    text = text1;
+                    isLoading = false;
+                  });
                 },
                 child: Text('Get'),
               ),
